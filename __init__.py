@@ -59,9 +59,6 @@ class MIO3CW_Preferences(bpy.types.AddonPreferences):
 
 
 translation_dict = {
-    "en_US": {
-        ("*", "translation dict ph"): "En Text",
-    },
     "ja_JP": {
         ("*", "Please select two or more objects"): "2つ以上のオブジェクトを選択してください",
         ("*", "The active object has no selected vertices"): "アクティブオブジェクトに選択された頂点がありません",

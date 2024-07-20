@@ -38,13 +38,6 @@ class MIO3_OT_copy_weight(Operator):
         active_index = active_vert.index
 
         selected_verts = [v for v in target_obj.data.vertices if v.select]
-        if not selected_verts:
-            active_bm.to_mesh(active_mesh)
-            active_mesh.update()
-            active_bm.free()
-            bpy.ops.object.mode_set(mode="EDIT")
-            self.report({"ERROR"}, "The target object has no selected vertices")
-            return {"CANCELLED"}
 
         vertex_groups = self.get_vgroups(active_obj, active_mesh.vertices[active_index])
         self.copy_weight(vertex_groups, selected_verts, target_obj)
@@ -52,12 +45,14 @@ class MIO3_OT_copy_weight(Operator):
 
         bpy.ops.object.mode_set(mode="EDIT")
 
-        bpy.context.view_layer.objects.active = target_obj
-        for g in selected_verts[0].groups:
-            vg = target_obj.vertex_groups[g.group]
-            if not vg.lock_weight:
-                bpy.ops.object.vertex_weight_paste(weight_group=g.group)
-        bpy.context.view_layer.objects.active = active_obj
+        if target_obj.use_mesh_mirror_x:
+            if selected_verts:
+                bpy.context.view_layer.objects.active = target_obj
+                for g in selected_verts[0].groups:
+                    vg = target_obj.vertex_groups[g.group]
+                    if not vg.lock_weight:
+                        bpy.ops.object.vertex_weight_paste(weight_group=g.group)
+                bpy.context.view_layer.objects.active = active_obj
 
         if active_mesh.count_selected_items()[0] > 1:
             bpy.ops.object.vertex_weight_copy()
