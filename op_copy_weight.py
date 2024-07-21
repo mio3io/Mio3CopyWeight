@@ -60,7 +60,8 @@ class MIO3_OT_copy_weight(Operator):
                     target_obj.vertex_groups.active_index = vg_index
 
         bpy.ops.object.mode_set(mode="EDIT")
-        bpy.ops.object.vertex_weight_copy()
+        if active_mesh.count_selected_items()[0] > 1:
+            bpy.ops.object.vertex_weight_copy()
 
         return {"FINISHED"}
 
