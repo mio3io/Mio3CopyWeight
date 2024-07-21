@@ -15,12 +15,10 @@ class MIO3_OT_copy_weight(Operator):
         return obj and obj.mode == "EDIT" and obj.type == "MESH"
 
     def execute(self, context):
-        if not len(context.selected_objects):
-            self.report({"ERROR"}, "Please select objects")
-            return {"CANCELLED"}
-
         active_obj = context.active_object
-        target_obj = [obj for obj in context.selected_objects if obj != active_obj][0]
+        target_obj = next(
+            (obj for obj in context.selected_objects if obj != active_obj), None
+        )
 
         bpy.ops.object.mode_set(mode="OBJECT")
 
@@ -39,31 +37,34 @@ class MIO3_OT_copy_weight(Operator):
 
         active_index = active_vert.index
 
-        selected_verts = [v for v in target_obj.data.vertices if v.select]
+        if target_obj:
+            selected_verts = [v for v in target_obj.data.vertices if v.select]
 
-        vertex_groups = self.get_vgroups(active_obj, active_mesh.vertices[active_index])
-        self.copy_weight(vertex_groups, selected_verts, target_obj)
-        target_obj.data.update()
+            vertex_groups = self.get_vgroups(active_obj, active_mesh.vertices[active_index])
+            self.copy_weight(vertex_groups, selected_verts, target_obj)
+            target_obj.data.update()
 
-        bpy.ops.object.mode_set(mode="EDIT")
+            bpy.ops.object.mode_set(mode="EDIT")
 
-        if target_obj.use_mesh_mirror_x:
-            if selected_verts:
-                bpy.context.view_layer.objects.active = target_obj
-                for g in selected_verts[0].groups:
-                    vg = target_obj.vertex_groups[g.group]
-                    if not vg.lock_weight:
-                        bpy.ops.object.vertex_weight_paste(weight_group=g.group)
-                bpy.context.view_layer.objects.active = active_obj
+            if target_obj.use_mesh_mirror_x:
+                if selected_verts:
+                    bpy.context.view_layer.objects.active = target_obj
+                    for g in selected_verts[0].groups:
+                        vg = target_obj.vertex_groups[g.group]
+                        if not vg.lock_weight:
+                            bpy.ops.object.vertex_weight_paste(weight_group=g.group)
+                    bpy.context.view_layer.objects.active = active_obj
+
+            if active_obj.vertex_groups.active:
+                target_group_name = active_obj.vertex_groups.active.name
+                if target_group_name in target_obj.vertex_groups:
+                    vg_index = target_obj.vertex_groups[target_group_name].index
+                    target_obj.vertex_groups.active_index = vg_index
 
         if active_mesh.count_selected_items()[0] > 1:
             bpy.ops.object.vertex_weight_copy()
 
-        if active_obj.vertex_groups.active:
-            target_group_name = active_obj.vertex_groups.active.name
-            if target_group_name in target_obj.vertex_groups:
-                vg_index = target_obj.vertex_groups[target_group_name].index
-                target_obj.vertex_groups.active_index = vg_index
+        bpy.ops.object.mode_set(mode="EDIT")
 
         return {"FINISHED"}
 
