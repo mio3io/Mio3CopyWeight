@@ -2,6 +2,7 @@ import bpy
 import bmesh
 from bpy.types import Operator
 
+
 class MIO3_OT_copy_weight(Operator):
     bl_idname = "object.mio3_vertex_weight_copy"
     bl_label = "Copy weights"
@@ -10,11 +11,12 @@ class MIO3_OT_copy_weight(Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.active_object and context.active_object.mode == "EDIT"
+        obj = context.active_object
+        return obj and obj.mode == "EDIT" and obj.type == "MESH"
 
     def execute(self, context):
-        if len(context.selected_objects) < 2:
-            self.report({"ERROR"}, "Please select two or more objects")
+        if not len(context.selected_objects):
+            self.report({"ERROR"}, "Please select objects")
             return {"CANCELLED"}
 
         active_obj = context.active_object
