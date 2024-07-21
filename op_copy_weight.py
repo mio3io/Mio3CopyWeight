@@ -16,9 +16,7 @@ class MIO3_OT_copy_weight(Operator):
 
     def execute(self, context):
         active_obj = context.active_object
-        target_obj = next(
-            (obj for obj in context.selected_objects if obj != active_obj), None
-        )
+        target_obj = next((obj for obj in context.selected_objects if obj != active_obj), None)
 
         bpy.ops.object.mode_set(mode="OBJECT")
 
@@ -61,10 +59,8 @@ class MIO3_OT_copy_weight(Operator):
                     vg_index = target_obj.vertex_groups[target_group_name].index
                     target_obj.vertex_groups.active_index = vg_index
 
-        if active_mesh.count_selected_items()[0] > 1:
-            bpy.ops.object.vertex_weight_copy()
-
         bpy.ops.object.mode_set(mode="EDIT")
+        bpy.ops.object.vertex_weight_copy()
 
         return {"FINISHED"}
 
