@@ -3,7 +3,7 @@ from . import op_copy_weight
 
 bl_info = {
     "name": "Mio3 Copy Weight",
-    "version": (0, 9),
+    "version": (1, 0, 0),
     "blender": (3, 6, 0),
     "location": "View 3D > Sidebar > Item Tab > Mio3 Copy Weight",
     "description": "Copies weights of selected vertices across objects",
