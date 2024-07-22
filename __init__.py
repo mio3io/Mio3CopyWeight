@@ -6,7 +6,7 @@ bl_info = {
     "version": (0, 9),
     "blender": (3, 6, 0),
     "location": "View 3D > Sidebar > Item Tab > Mio3 Copy Weight",
-    "description": "",
+    "description": "Copies weights of selected vertices across objects",
     "category": "Object",
 }
 
