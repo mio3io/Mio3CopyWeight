@@ -60,9 +60,7 @@ class MIO3CW_Preferences(bpy.types.AddonPreferences):
 
 translation_dict = {
     "ja_JP": {
-        ("*", "Please select objects"): "オブジェクトを選択してください",
         ("*", "The active object has no selected vertices"): "アクティブオブジェクトに選択された頂点がありません",
-        ("*", "The target object has no selected vertices"): "ターゲットオブジェクトに選択された頂点がありません",
     }
 }  # fmt: skip
 

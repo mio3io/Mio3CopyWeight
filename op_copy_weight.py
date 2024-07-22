@@ -17,31 +17,27 @@ class MIO3_OT_copy_weight(Operator):
     def execute(self, context):
         active_obj = context.active_object
         target_obj = next((obj for obj in context.selected_objects if obj != active_obj), None)
-
-        bpy.ops.object.mode_set(mode="OBJECT")
-
         active_mesh = active_obj.data
-        active_bm = bmesh.new()
-        active_bm.from_mesh(active_mesh)
+
+        active_bm = bmesh.from_edit_mesh(active_mesh)
         active_bm.verts.ensure_lookup_table()
         active_vert = active_bm.select_history.active
         if not active_vert:
-            active_bm.to_mesh(active_mesh)
-            active_mesh.update()
-            active_bm.free()
-            bpy.ops.object.mode_set(mode="EDIT")
+            bmesh.update_edit_mesh(active_mesh)
             self.report({"ERROR"}, "The active object has no selected vertices")
             return {"CANCELLED"}
 
         active_index = active_vert.index
 
-        if target_obj:
-            selected_verts = [v for v in target_obj.data.vertices if v.select]
+        if active_mesh.total_vert_sel > 1:
+            bpy.ops.object.vertex_weight_copy()
 
+        if target_obj:
+            bpy.ops.object.mode_set(mode="OBJECT")
+            selected_verts = [v for v in target_obj.data.vertices if v.select]
             vertex_groups = self.get_vgroups(active_obj, active_mesh.vertices[active_index])
             self.copy_weight(vertex_groups, selected_verts, target_obj)
             target_obj.data.update()
-
             bpy.ops.object.mode_set(mode="EDIT")
 
             if target_obj.use_mesh_mirror_x:
@@ -58,10 +54,6 @@ class MIO3_OT_copy_weight(Operator):
                 if target_group_name in target_obj.vertex_groups:
                     vg_index = target_obj.vertex_groups[target_group_name].index
                     target_obj.vertex_groups.active_index = vg_index
-
-        bpy.ops.object.mode_set(mode="EDIT")
-        if active_mesh.count_selected_items()[0] > 1:
-            bpy.ops.object.vertex_weight_copy()
 
         return {"FINISHED"}
 
